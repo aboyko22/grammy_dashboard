@@ -20,6 +20,7 @@
 
 # RStudio files
 .Rproj.user/
+grammy_dashboard.Rproj
 
 # produced vignettes
 vignettes/*.html
@@ -47,3 +48,7 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# big data files
+data/hot-100-current.csv
+data/tracks_features.csv
