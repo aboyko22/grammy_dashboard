@@ -83,10 +83,11 @@ modeling_data <- winners %>%
   rbind(combined_data) %>%
   filter(!is.na(started_charting)) %>%
   mutate(won_grammy = factor(won_grammy)) %>%
-  distinct(tolower(artist), tolower(song), .keep_all = TRUE)
+  distinct(tolower(artist), tolower(song), .keep_all = TRUE) %>%
+  select(-c('tolower(artist)', 'tolower(song)'))
 
 # this filters out Michelle - The Beatles, which one but never charted
 # if we expand to having non-charting songs in the future, we can resolve this
 
 # write out modeling data ----
-write.csv(modeling_data, file = "data/modeling_data.csv")
+write.csv(modeling_data, file = "data/modeling_data.csv", row.names = FALSE)
