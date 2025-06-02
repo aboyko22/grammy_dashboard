@@ -9,6 +9,8 @@ billboard_join <- read_csv("data/billboard_join.csv")
 spotify_join <- read_csv("data/spotify_join.csv")
 manually_collected <- read_csv("data/manually_collected.csv")
 
+testing_data <- read_csv("data/universal_top_spotify_songs.csv")
+
 # clean spotify data ----
 spotify_data %>%
   skimr::skim()
@@ -52,15 +54,38 @@ winners <- spotify_join %>%
   select(-c(winner_id, year.x, year.y, performer.y, title.y, year, won.y))
   
 # combine information ----
+clean_artist <- function(artist_vec) {
+  pattern <- "(,|:|&|\\bwith\\b|\\band\\b|\\bfeat.\\b|\\bfeaturing\\b|\\().*"
+  
+  cleaned <- sub("é", "e", artist_vec, ignore.case = TRUE)
+  cleaned <- sub("¥\\$[: ,]", "", cleaned)
+  cleaned <- sub(pattern, "", cleaned, ignore.case = TRUE)
+  
+  cleaned <- trimws(cleaned)
+  
+  return(cleaned)
+}
+
+clean_song <- function(song_vec) {
+  pattern <- "(\\?|-|\\bfeat.\\b|\\bfeaturing\\b|\\().*"
+  
+  cleaned <- sub(pattern, "", song_vec, ignore.case = TRUE)
+  cleaned <- gsub('[\'"’‘★*]', "", cleaned)
+  
+  cleaned <- trimws(cleaned)
+  
+  return(cleaned)
+}
+
 cleaned_spotify_data <- spotify_data %>%
   mutate(artist = str_match(artists, "\\[(?:\\s*)((['\"])(.*?)\\2)")[,4]) %>%
   select(-artists) %>%
   rbind(manually_collected) %>%
-  mutate(join_artist = tolower(artist), join_name = tolower(name)) %>%
+  mutate(join_artist = tolower(clean_artist(artist)), join_name = tolower(clean_song(name))) %>%
   distinct(join_name, join_artist, .keep_all = TRUE)
 
 cleaned_billboard_data <- billboard_data %>%
-  filter(between(year(chart_week), left = 1960, right = 2020)) %>%
+  filter(year(chart_week) >= 1960) %>%
   mutate(chart_quarter = lubridate::quarter(chart_week)) %>%
   group_by(performer, title) %>%
   summarize(weeks_on_chart = max(wks_on_chart),
@@ -71,7 +96,7 @@ cleaned_billboard_data <- billboard_data %>%
             charted_q3 = any(chart_quarter == 3),
             charted_q4 = any(chart_quarter == 4),
             .groups = "drop") %>%
-  mutate(join_artist = tolower(performer), join_name = tolower(title))
+  mutate(join_artist = tolower(clean_artist(performer)), join_name = tolower(clean_song(title)))
 
 combined_data <- cleaned_spotify_data %>%
   left_join(cleaned_billboard_data, by = join_by(join_artist == join_artist, join_name == join_name)) %>%
@@ -91,3 +116,19 @@ modeling_data <- winners %>%
 
 # write out modeling data ----
 write.csv(modeling_data, file = "data/modeling_data.csv", row.names = FALSE)
+
+# cleaning testing data ----
+testing_data <- testing_data %>%
+  mutate(join_artist = tolower(clean_artist(artists)), join_name = tolower(clean_song(name)),
+         mode = factor(mode, levels = c(0, 1)),
+         time_signature = factor(time_signature),
+         duration_sec = duration_ms / 1000) %>%
+  select(-c(spotify_id, daily_rank, daily_movement, weekly_movement, country,
+            snapshot_date, popularity, album_name, album_release_date, duration_ms)) %>%
+  left_join(cleaned_billboard_data, by = join_by(join_artist == join_artist, join_name == join_name)) %>%
+  distinct(join_name, join_artist, .keep_all = TRUE) %>%
+  rename(song = name, artist = artists) %>% filter(!is.na(charted_q1)) %>%
+  select(-c(join_artist, join_name, performer, title))
+
+# write out testing data ----
+write.csv(testing_data, file = "data/testing_data.csv", row.names = FALSE)
