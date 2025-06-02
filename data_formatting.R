@@ -123,8 +123,9 @@ testing_data <- testing_data %>%
          mode = factor(mode, levels = c(0, 1)),
          time_signature = factor(time_signature),
          duration_sec = duration_ms / 1000) %>%
-  select(-c(spotify_id, daily_rank, daily_movement, weekly_movement, country,
-            snapshot_date, popularity, album_name, album_release_date, duration_ms)) %>%
+  rename(release_data = album_release_date, explicit = is_explicit) %>%
+  select(-c(daily_rank, daily_movement, weekly_movement, country,
+            snapshot_date, popularity, album_name, duration_ms)) %>%
   left_join(cleaned_billboard_data, by = join_by(join_artist == join_artist, join_name == join_name)) %>%
   distinct(join_name, join_artist, .keep_all = TRUE) %>%
   rename(song = name, artist = artists) %>% filter(!is.na(charted_q1)) %>%
