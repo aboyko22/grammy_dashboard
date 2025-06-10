@@ -5,7 +5,7 @@ library(gtExtras)
 
 # load data ----
 data <- read_csv("data/modeling_data.csv")
-predictions <- read_csv("data/top_prediction.csv")
+predictions <- read_csv("data/predictions.csv")
 
 # primary histograms ----
 data %>%
@@ -99,3 +99,40 @@ predictions %>%
         panel.border = element_blank(),
         plot.margin = margin(0, 0, 0, 0),
         panel.spacing = unit(0, "null"))
+
+# for story (not dashboard) ----
+data %>%
+  filter(started_charting >= 1990) %>%
+  ggplot(aes(x = started_charting, y = duration_sec)) +
+  geom_point(aes(colour = won_grammy, size = won_grammy))
+
+cor_matrix <- data %>%
+  filter(won_grammy == "Yes") %>%
+  select(-c(artist, song, won_grammy)) %>%
+  cor() %>%
+  as_tibble()
+
+cor_matrix$var1 <- colnames(cor_matrix)
+cor_matrix <- gather(cor_matrix, key = "var2", value = "value", -var1)
+
+cor_matrix %>%
+  ggplot(aes(x = var1, y = var2, fill = value)) +
+  geom_tile(color = 'black') +
+  scale_fill_gradient2(low = "navy", mid = "white", high = "darkred", midpoint = 0, limits = c(-1, 1)) +
+  labs(x = "", y = "", fill = "Correlation") +
+  theme_fivethirtyeight() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 20, hjust = 0),
+        legend.position = "right", legend.direction = "vertical")
+
+data %>%
+  filter(won_grammy == "Yes") %>%
+  ggplot(aes(x = started_charting, y = weeks_on_chart)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+data %>%
+  filter(won_grammy == "Yes", started_charting >= 1990) %>%
+  ggplot(aes(x = started_charting, y = duration_sec)) +
+  geom_point() +
+  geom_smooth()

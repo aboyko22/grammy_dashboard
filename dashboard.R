@@ -8,10 +8,10 @@ library(gtExtras)
 library(DT)
 
 # load local data ----
-data <- read_csv("data/modeling_data.csv")
-testing_data <- read_csv("data/testing_data.csv")
-audio_features <- read_csv("data/audio_feature_descriptions.csv")
-predictions <- read_csv("data/predictions.csv")
+data <- read_csv("dashboard_data/modeling_data.csv")
+testing_data <- read_csv("dashboard_data/testing_data.csv")
+audio_features <- read_csv("dashboard_data/audio_feature_descriptions.csv")
+predictions <- read_csv("dashboard_data/predictions.csv")
 
 predictions <- predictions %>%
   mutate(label = paste0(round(Grammy_Prob * 100, digits = 1), "%"))
@@ -130,7 +130,19 @@ ui <- page_navbar(
   # sources page ----
   nav_panel(title = "Sources", icon = icon(name = "book-open", lib = "font-awesome"),
             
-            div(h1("Coming Soon"), p("Check back later for information about where the data comes from, and what resources were used to create this dashboard."))
+            card(style = "background-color: #F0F0F0; font-size: 20px;",
+              div(h3("Data Sources"), br(),
+                  p("The following datasets were used to obtain Spotify audio feature data to train the model."),
+                  p("•", a("https://www.kaggle.com/datasets/rodolfofigueroa/spotify-12m-songs", href = "https://www.kaggle.com/datasets/rodolfofigueroa/spotify-12m-songs")),
+                  p("•", a("https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset", href = "https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset")),
+                  p("•", a("https://www.kaggle.com/datasets/tomigelo/spotify-audio-features", href = "https://www.kaggle.com/datasets/tomigelo/spotify-audio-features")),
+                  p("•", a("https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks", href = "https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks")),
+                  br(),
+                  p("The following dataset was used to obtain Spotify audio feature data to test the model."),
+                  p("•", a("https://www.kaggle.com/code/seanbearden/so-you-want-to-be-top-50", href = "https://www.kaggle.com/code/seanbearden/so-you-want-to-be-top-50")),
+                  br(),
+                  p("All billboard streaming data comes from the following source."),
+                  p("•", a("https://github.com/utdata/rwd-billboard-data", href = "https://github.com/utdata/rwd-billboard-data"))))
   )
 )
 

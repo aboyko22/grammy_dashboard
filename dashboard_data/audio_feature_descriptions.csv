@@ -1,0 +1,10 @@
+feature,description
+danceability,"This feature describes how suitable a track is for dancing based on musical elements like tempo, rhythm stability, beat strength, and overall regularity. A higher danceability score indicates a more danceable track."
+energy,"Representing the intensity and activity level of a track, this feature is often correlated with fast, loud, and noisy tracks. Tracks with high energy scores tend to be more upbeat and energetic."
+loudness,"Representing the overall loudness of a track in decibels (dB), this feature can be useful for audio normalization or volume adjustment purposes."
+speechiness,"Speechiness identifies tracks that contain spoken words, like podcasts or rap music. Higher values indicate more speech-like sounds, distinguishing them from purely instrumental tracks."
+acousticness,"This feature is a confidence measure of whether a track is acoustic. Tracks with higher acousticness scores are more likely to be acoustic, with little or no electronic elements."
+instrumentalness,"As the name suggests, this feature predicts whether a track contains no vocals. A higher instrumentalness score indicates a higher likelihood that the track is purely instrumental."
+liveness,"Liveness detects the presence of an audience in the recording. A higher value suggests the track was performed live, offering a sense of authenticity and connection."
+valence,"Also known as the “positiveness” score, valence describes the musical positiveness conveyed by a track. Tracks with higher valence scores tend to sound more positive, cheerful, and euphoric, while lower scores suggest more negative, sad, or depressing emotions."
+tempo,"The overall estimated tempo of a track, measured in beats per minute (BPM), can be crucial for applications like automatic DJ mixing or beat-synchronized visualizations."
